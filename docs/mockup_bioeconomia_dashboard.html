@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.25">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Mockup Bioeconomía (Dashboard) – Base de datos de Cuentas Nacionales para la Bioeconomía</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-7b89279ff1a6dce999919e0e67d4d9ec.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-dark-707d8167ce6003fca903bfe2be84ab7f.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-7b89279ff1a6dce999919e0e67d4d9ec.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-c78d814eed26a74be727ee35b6a76a55.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-dark-c78d814eed26a74be727ee35b6a76a55.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-c78d814eed26a74be727ee35b6a76a55.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<script src="site_libs/quarto-dashboard/quarto-dashboard.js"></script>
+<script src="site_libs/quarto-dashboard/stickythead.js"></script>
+
+
+
+<script src="site_libs/quarto-dashboard/web-components.js" type="module"></script>
+<script src="site_libs/quarto-dashboard/components.js"></script>
+
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<link href="site_libs/selectize-0.15.2/css/selectize.bootstrap3.css" rel="stylesheet">
+<script src="site_libs/selectize-0.15.2/js/selectize.min.js"></script>
+<script src="site_libs/selectize-0.15.2/accessibility/js/selectize-plugin-a11y.min.js"></script>
+<link href="site_libs/htmltools-fill-0.5.8.1/fill.css" rel="stylesheet">
+
+
+</head>
+
+<body class="quarto-dashboard nav-fixed dashboard-fill fullcontent quarto-light">
+
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="./index.html" class="navbar-brand navbar-brand-logo">
+    </a>
+    <a class="navbar-brand" href="./index.html">
+    <span class="navbar-title">Base de datos de Cuentas Nacionales para la Bioeconomía</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="./index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./about.html"> 
+<span class="menu-text">Acerca</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+<header id="quarto-dashboard-header">
+<nav class="navbar navbar-expand-md slim" data-bs-theme="dark">
+  <div class="navbar-container container-fluid">
+    <button class="navbar-toggler hidden" type="button" data-bs-toggle="collapse" data-bs-target="#dashboard-collapse" aria-controls="dashboard-collapse" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>    
+
+
+    <div class="navbar-brand-container">
+
+
+      <div class="navbar-title">
+        <div class="navbar-title-text"><a href="#">Mockup Bioeconomía (Dashboard)</a></div>
+        
+        
+      </div>
+    </div>
+</div>
+</nav>
+</header></header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-layout-custom page-navbar quarto-dashboard-content bslib-gap-spacing html-fill-container bslib-page-fill">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+<!-- main -->
+
+<div class="bslib-grid-item html-fill-item bslib-grid dashboard-sidebar-container" data-layout="fill" style="display: grid; grid-template-columns: minmax(3em, 1fr) minmax(3em, 1fr) minmax(3em, 1fr) minmax(3em, 1fr);
+grid-auto-rows: minmax(0, 1fr);">
+<div class="bslib-sidebar-layout html-fill-item html-fill-container" data-bslib-sidebar-open="desktop" data-bslib-sidebar-init="true"><div class="main html-fill-container html-fill-item"><div class="sidebar-content html-fill-item html-fill-container">
+
+</div></div><aside id="bslib-sidebar-1" class="sidebar html-fill-container html-fill-item"><div class="html-fill-container html-fill-item">
+<div class="cell-output-display no-overflow-x">
+<div class="form-group shiny-input-container" style="width:100%;">
+<label class="control-label" id="actividad-label" for="actividad">Actividad económica (Descripción Actividades)</label>
+<div>
+<select id="actividad" class="shiny-input-select"><option value="011 - Cultivos agrícolas. 014 - Servicios agrícolas y pecuarios, excepto los veterinarios" selected="">011 - Cultivos agrícolas. 014 - Servicios agrícolas y pecuarios, excepto los veterinarios</option>
+<option value="012 - Cría de animales">012 - Cría de animales</option>
+<option value="015 - Caza, repoblación de animales de caza y servicios conexos">015 - Caza, repoblación de animales de caza y servicios conexos</option>
+<option value="016 - Construcciones agropecuarias">016 - Construcciones agropecuarias</option>
+<option value="020 - Silvicultura, extracción de madera y servicios conexos">020 - Silvicultura, extracción de madera y servicios conexos</option>
+<option value="050 - Pesca">050 - Pesca</option>
+<option value="101 - Extracción y aglomeración de carbón de piedra">101 - Extracción y aglomeración de carbón de piedra</option>
+<option value="111 - Extracción de petróleo crudo y gas natural.">111 - Extracción de petróleo crudo y gas natural.</option>
+<option value="112 - Actividades de servicios relacionadas con la extracción de petróleo y gas excepto las act. de prospección">112 - Actividades de servicios relacionadas con la extracción de petróleo y gas excepto las act. de prospección</option>
+<option value="132 - Extracción de minerales metalíferos no ferrosos, excepto los minerales de uranio y torio">132 - Extracción de minerales metalíferos no ferrosos, excepto los minerales de uranio y torio</option>
+<option value="141 - Extracción de piedra arena y arcilla. 142 - Explotación de minas y canteras n.c.p">141 - Extracción de piedra arena y arcilla. 142 - Explotación de minas y canteras n.c.p</option>
+<option value="1511 - Producción, procesamiento y conservación de carne y productos
+
+cárnicos">1511 - Producción, procesamiento y conservación de carne y productos
+
+cárnicos</option>
+<option value="1512 - Elaboración de pescado y productos de pescado">1512 - Elaboración de pescado y productos de pescado</option>
+<option value="15120 - Elaboración de pescado y productos de pescado">15120 - Elaboración de pescado y productos de pescado</option>
+<option value="1513 - Preparación de frutas, hortalizas y legumbres">1513 - Preparación de frutas, hortalizas y legumbres</option>
+<option value="15130 - Preparación de frutas, hortalizas y legumbres">15130 - Preparación de frutas, hortalizas y legumbres</option>
+<option value="1514 - Elaboración de aceites y grasas de origen vegetal">1514 - Elaboración de aceites y grasas de origen vegetal</option>
+<option value="15140 - Elaboración de aceites y grasas de origen vegetal">15140 - Elaboración de aceites y grasas de origen vegetal</option>
+<option value="1520 - Elaboración de productos lácteos">1520 - Elaboración de productos lácteos</option>
+<option value="15200 - Elaboración de productos lácteos">15200 - Elaboración de productos lácteos</option>
+<option value="1531 - Elaboración de productos de molinería. 1532 - Elaboración de almidones y productos derivados del almidón">1531 - Elaboración de productos de molinería. 1532 - Elaboración de almidones y productos derivados del almidón</option>
+<option value="15330 - Elaboración de alimentos preparados para animales">15330 - Elaboración de alimentos preparados para animales</option>
+<option value="1541 - Elaboración de productos de panadería">1541 - Elaboración de productos de panadería</option>
+<option value="15420 - Elaboración de azúcar">15420 - Elaboración de azúcar</option>
+<option value="15430 - Elaboración de cacao y chocolate y de productos de confitería">15430 - Elaboración de cacao y chocolate y de productos de confitería</option>
+<option value="15441 - Elaboración de pastas alimenticias frescas. 15442 - Elaboración de pastas alimenticias secas">15441 - Elaboración de pastas alimenticias frescas. 15442 - Elaboración de pastas alimenticias secas</option>
+<option value="15491 - Tostado, torrado y molienda de café. Elaboración y molienda de hierbas aromáticas y especias. 15492 - Preparación de hojas de té. 15493 - Elaboración de yerba mate.15499 - Elaboración de productos alimenticios n.c.p.">15491 - Tostado, torrado y molienda de café. Elaboración y molienda de hierbas aromáticas y especias. 15492 - Preparación de hojas de té. 15493 - Elaboración de yerba mate.15499 - Elaboración de productos alimenticios n.c.p.</option>
+<option value="15510 - Destilación, rectificación y mezcla de bebidas alcohólicas; producción de alcohol etílico">15510 - Destilación, rectificación y mezcla de bebidas alcohólicas; producción de alcohol etílico</option>
+<option value="15521 - Elaboración de vinos. 15529 - Elaboración de sidra y otras bebidas alcohólicas fermentadas a partir de frutas">15521 - Elaboración de vinos. 15529 - Elaboración de sidra y otras bebidas alcohólicas fermentadas a partir de frutas</option>
+<option value="15530 - Elaboración de cerveza, bebidas malteadas y de malta">15530 - Elaboración de cerveza, bebidas malteadas y de malta</option>
+<option value="15541 - Elaboración de soda y aguas. 15542 - Elaboración de bebidas gaseosas, excepto soda. 15549 - Elaboración de hielo, jugos envasados para diluir y otras bebidas no alcohólicas">15541 - Elaboración de soda y aguas. 15542 - Elaboración de bebidas gaseosas, excepto soda. 15549 - Elaboración de hielo, jugos envasados para diluir y otras bebidas no alcohólicas</option>
+<option value="16001 - Preparación de hojas de tabaco. 16009 - Elaboración de cigarrillos y productos de tabaco n.c.p.">16001 - Preparación de hojas de tabaco. 16009 - Elaboración de cigarrillos y productos de tabaco n.c.p.</option>
+<option value="171 - Hilatura, tejedura y acabado de productos textiles. 172 - Fabricación de otros productos textiles">171 - Hilatura, tejedura y acabado de productos textiles. 172 - Fabricación de otros productos textiles</option>
+<option value="181 - Fabricación de prendas de vestir, excepto prendas de piel. 18401 - Fabricación de medias. 18402 - Fabricación de suéteres y artículos similares de punto. 18900-Servicios industriales para la industria confeccionista.">181 - Fabricación de prendas de vestir, excepto prendas de piel. 18401 - Fabricación de medias. 18402 - Fabricación de suéteres y artículos similares de punto. 18900-Servicios industriales para la industria confeccionista.</option>
+<option value="19110 - Curtido y terminación de cueros. 19120 - Fabricación de maletas, bolsos de mano y similares, artículos de talabartería y artículos de cuero n.c.p.">19110 - Curtido y terminación de cueros. 19120 - Fabricación de maletas, bolsos de mano y similares, artículos de talabartería y artículos de cuero n.c.p.</option>
+<option value="19201 - Fabricación de calzado de cuero, excepto el ortopédico. 19202 - Fabricación de calzado de tela, plástico, goma, caucho y otros materiales, excepto calzado ortopédico y de asbesto. 19203-Fabricación de partes de calzado">19201 - Fabricación de calzado de cuero, excepto el ortopédico. 19202 - Fabricación de calzado de tela, plástico, goma, caucho y otros materiales, excepto calzado ortopédico y de asbesto. 19203-Fabricación de partes de calzado</option>
+<option value="201 - Aserrado y acepilladura de madera. 202 - Fabricación de productos de madera, corcho, paja y materiales trenzables">201 - Aserrado y acepilladura de madera. 202 - Fabricación de productos de madera, corcho, paja y materiales trenzables</option>
+<option value="210 - Fabricación de papel y de productos de papel">210 - Fabricación de papel y de productos de papel</option>
+<option value="221 - Actividades de edición">221 - Actividades de edición</option>
+<option value="22210 - Impresión. 22220-Servicios relacionados con la impresión">22210 - Impresión. 22220-Servicios relacionados con la impresión</option>
+<option value="23200 - Fabricación de productos de la refinación del petróleo. 23300-Fabricación de combustible nuclear">23200 - Fabricación de productos de la refinación del petróleo. 23300-Fabricación de combustible nuclear</option>
+<option value="24111 - Fabricación de gases comprimidos y licuados. 24119-Fabricación de materias químicas orgánicas básicas, n.c.p.">24111 - Fabricación de gases comprimidos y licuados. 24119-Fabricación de materias químicas orgánicas básicas, n.c.p.</option>
+<option value="24120 - Fabricación de abonos y compuestos de nitrógeno. 24210 - Fabricación de plaguicidas y productos químicos de uso agropecuario">24120 - Fabricación de abonos y compuestos de nitrógeno. 24210 - Fabricación de plaguicidas y productos químicos de uso agropecuario</option>
+<option value="24130 - Fabricación de plásticos en formas primarias y de caucho sintético">24130 - Fabricación de plásticos en formas primarias y de caucho sintético</option>
+<option value="242 - Fabricación de otros productos químicos (excl 24210 - Fabricación de plaguicidas y productos químicos de uso agropecuario)">242 - Fabricación de otros productos químicos (excl 24210 - Fabricación de plaguicidas y productos químicos de uso agropecuario)</option>
+<option value="251 - Fabricación de productos de caucho">251 - Fabricación de productos de caucho</option>
+<option value="25201 - Fabricación de envases plásticos. 25209 - Fabricación de productos plásticos en formas básicas y artículos de plástico n.c.p., excepto muebles">25201 - Fabricación de envases plásticos. 25209 - Fabricación de productos plásticos en formas básicas y artículos de plástico n.c.p., excepto muebles</option>
+<option value="26101 - Fabricación de envases de vidrio. 26102 - Fabricación y elaboración de vidrio plano. 26109 - Fabricación de productos de vidrio n.c.p.">26101 - Fabricación de envases de vidrio. 26102 - Fabricación y elaboración de vidrio plano. 26109 - Fabricación de productos de vidrio n.c.p.</option>
+<option value="269 - Fabricación de productos minerales no metálicos n.c.p.">269 - Fabricación de productos minerales no metálicos n.c.p.</option>
+<option value="27100 - Industrias básicas de hierro y acero">27100 - Industrias básicas de hierro y acero</option>
+<option value="27201 - Elaboración de aluminio primario y semielaborados de aluminio. 27209 - Producción de metales no ferrosos n.c.p. y sus semielaborados">27201 - Elaboración de aluminio primario y semielaborados de aluminio. 27209 - Producción de metales no ferrosos n.c.p. y sus semielaborados</option>
+<option value="27310 - Fundición de hierro y acero. 27320 - Fundición de metales no ferrosos">27310 - Fundición de hierro y acero. 27320 - Fundición de metales no ferrosos</option>
+<option value="28110 - Fabricación de productos metálicos para uso estructural y montaje estructural. 28120 - Fabricación de tanques, depósitos y recipientes de metal. 28130 - Fabricación de generadores de vapor">28110 - Fabricación de productos metálicos para uso estructural y montaje estructural. 28120 - Fabricación de tanques, depósitos y recipientes de metal. 28130 - Fabricación de generadores de vapor</option>
+<option value="289 - Fabricación de otros productos elaborados de metal; actividades
+
+de servicios de trabajo de metales">289 - Fabricación de otros productos elaborados de metal; actividades
+
+de servicios de trabajo de metales</option>
+<option value="29110 - Fabricación de motores y turbinas, excepto motores para aeronaves, vehículos automotores y motocicletas. 29120 - Fabricación de bombas. compresores. grifos y válvulas. 29130 - Fabricación de cojinetes. engranajes. trenes de engranaje y piezas de transmisión. 29140 - Fabricación de hornos. hogares y quemadores. 29150 - Fabricación de equipo de elevación y manipulación 29190 - Fabricación de maquinaria y equipo de uso general n.c.p.">29110 - Fabricación de motores y turbinas, excepto motores para aeronaves, vehículos automotores y motocicletas. 29120 - Fabricación de bombas. compresores. grifos y válvulas. 29130 - Fabricación de cojinetes. engranajes. trenes de engranaje y piezas de transmisión. 29140 - Fabricación de hornos. hogares y quemadores. 29150 - Fabricación de equipo de elevación y manipulación 29190 - Fabricación de maquinaria y equipo de uso general n.c.p.</option>
+<option value="292 - Fabricación de maquinaria de uso especial">292 - Fabricación de maquinaria de uso especial</option>
+<option value="29300 - Fabricación de aparatos de uso doméstico n.c.p.">29300 - Fabricación de aparatos de uso doméstico n.c.p.</option>
+<option value="30000 - Fabricación de maquinaria de oficina, contabilidad e informática">30000 - Fabricación de maquinaria de oficina, contabilidad e informática</option>
+<option value="31100 - Fabricación de motores, generadores y transformadores eléctricos. 31200 - Fabricación de aparatos de distribución y control de la energía eléctrica">31100 - Fabricación de motores, generadores y transformadores eléctricos. 31200 - Fabricación de aparatos de distribución y control de la energía eléctrica</option>
+<option value="31300 - Fabricación de hilos y cables aislados">31300 - Fabricación de hilos y cables aislados</option>
+<option value="31400 - Fabricación de acumuladores, pilas y baterías primarias. 31500 - Fabricación de lámparas eléctricas y equipo de iluminación. 31900 - Fabricación de equipo eléctrico n.c.p.">31400 - Fabricación de acumuladores, pilas y baterías primarias. 31500 - Fabricación de lámparas eléctricas y equipo de iluminación. 31900 - Fabricación de equipo eléctrico n.c.p.</option>
+<option value="32100 - Fabricación de tubos, válvulas y otros componentes electrónicos. 32200 - Fabricación de transmisores de radio y televisión y de aparatos para telefonía y telegrafía con hilos (equipos de comunicación)">32100 - Fabricación de tubos, válvulas y otros componentes electrónicos. 32200 - Fabricación de transmisores de radio y televisión y de aparatos para telefonía y telegrafía con hilos (equipos de comunicación)</option>
+<option value="32300 - Fabricación de receptores de radio y televisión, aparatos de grabación y reproducción de sonido y video, y productos conexos">32300 - Fabricación de receptores de radio y televisión, aparatos de grabación y reproducción de sonido y video, y productos conexos</option>
+<option value="33110 - Fabricación de equipo médico y quirúrgico y de aparatos ortopédicos. 33120 - Fabricación de instrumentos y aparatos para medir, verificar, ensayar, navegar, control de procesos industriales y otros fines. 33200 - Fabricación de instrumentos de óptica y equipo fotográfico">33110 - Fabricación de equipo médico y quirúrgico y de aparatos ortopédicos. 33120 - Fabricación de instrumentos y aparatos para medir, verificar, ensayar, navegar, control de procesos industriales y otros fines. 33200 - Fabricación de instrumentos de óptica y equipo fotográfico</option>
+<option value="341 - Fabricación de vehículos automotores. 342 - Fabricación de carrocerías para vehículos automotores; fabricación
+
+de remolques y semirremolques">341 - Fabricación de vehículos automotores. 342 - Fabricación de carrocerías para vehículos automotores; fabricación
+
+de remolques y semirremolques</option>
+<option value="34300 - Fabricación de partes; piezas y accesorios para vehículos automotores y sus motores">34300 - Fabricación de partes; piezas y accesorios para vehículos automotores y sus motores</option>
+<option value="351 - Construcción y reparación de buques y otras embarcaciones. 352 - Fabricación de locomotoras y de material rodante para ferrocarriles y tranvías. 353 Fabricación de aeronaves y naves espaciales. 359 Fabricación de otros tipos de equipo de transporte n.c.p.">351 - Construcción y reparación de buques y otras embarcaciones. 352 - Fabricación de locomotoras y de material rodante para ferrocarriles y tranvías. 353 Fabricación de aeronaves y naves espaciales. 359 Fabricación de otros tipos de equipo de transporte n.c.p.</option>
+<option value="361 - Fabricación de muebles. 369 - Industrias manufactureras, n.c.p.">361 - Fabricación de muebles. 369 - Industrias manufactureras, n.c.p.</option>
+<option value="37 - Reciclado. 38 - Reparación y mantenimiento">37 - Reciclado. 38 - Reparación y mantenimiento</option>
+<option value="401 - Generación captación y distribución de energía eléctrica">401 - Generación captación y distribución de energía eléctrica</option>
+<option value="402 - Fabricación de gas ; distribución de combustibles gaseosos por tuberías">402 - Fabricación de gas ; distribución de combustibles gaseosos por tuberías</option>
+<option value="41 - Captación , depuración y distribución de agua">41 - Captación , depuración y distribución de agua</option>
+<option value="45 - Construcción">45 - Construcción</option>
+<option value="502 - Comercios por mayor y menor, mantenimiento y reparación de automotores">502 - Comercios por mayor y menor, mantenimiento y reparación de automotores</option>
+<option value="51 - Comercio mayorista">51 - Comercio mayorista</option>
+<option value="521/5 - Comercio minorista excepto reparaciones">521/5 - Comercio minorista excepto reparaciones</option>
+<option value="526 - Reparación de efectos personales y enseres domésticos">526 - Reparación de efectos personales y enseres domésticos</option>
+<option value="551 - Hoteles ; campamentos y otros tipos de hospedaje temporal">551 - Hoteles ; campamentos y otros tipos de hospedaje temporal</option>
+<option value="552 - Restaurantes, bares y cantinas">552 - Restaurantes, bares y cantinas</option>
+<option value="601 - Servicio de transporte ferroviario">601 - Servicio de transporte ferroviario</option>
+<option value="602 - Servicio de transporte automotor">602 - Servicio de transporte automotor</option>
+<option value="603 - Transporte por tuberías">603 - Transporte por tuberías</option>
+<option value="61 - TRANSPORTE POR VÍA ACUÁTICA">61 - TRANSPORTE POR VÍA ACUÁTICA</option>
+<option value="62 - TRANSPORTE POR VÍA AÉREA">62 - TRANSPORTE POR VÍA AÉREA</option>
+<option value="63 - ACTIVIDADES DE TRANSPORTE COMPLEMENTARIAS Y AUXILIARES; ACTIVIDADES DE AGENCIAS DE VIAJES">63 - ACTIVIDADES DE TRANSPORTE COMPLEMENTARIAS Y AUXILIARES; ACTIVIDADES DE AGENCIAS DE VIAJES</option>
+<option value="641 - Servicios de correos">641 - Servicios de correos</option>
+<option value="642 - Servicios de transmisión de radio y televisión">642 - Servicios de transmisión de radio y televisión</option>
+<option value="643 - Servicios de Telecomunicaciones">643 - Servicios de Telecomunicaciones</option>
+<option value="644 - Servicios de Internet">644 - Servicios de Internet</option>
+<option value="651 2 - Intermediación monetaria">651 2 - Intermediación monetaria</option>
+<option value="659 - Otros tipos de intermediación financiera">659 - Otros tipos de intermediación financiera</option>
+<option value="66 - Financiación de planes de seguros y de pensiones, excepto los planes">66 - Financiación de planes de seguros y de pensiones, excepto los planes</option>
+<option value="67 - ACTIVIDADES AUXILIARES DE LA INTERMEDIACIÓN">67 - ACTIVIDADES AUXILIARES DE LA INTERMEDIACIÓN</option>
+<option value="701 A - Propiedad de la vivienda.">701 A - Propiedad de la vivienda.</option>
+<option value="701 B - Alquiler de los sectores productores.">701 B - Alquiler de los sectores productores.</option>
+<option value="702 - Actividades inmobiliarias realizadas a cambio de una retribución o por contrata">702 - Actividades inmobiliarias realizadas a cambio de una retribución o por contrata</option>
+<option value="71 - ALQUILER DE MAQUINARIA Y EQUIPO SIN OPERARIOS Y DE EFECTOS PERSONALES Y ENSERES DOMÉSTICOS">71 - ALQUILER DE MAQUINARIA Y EQUIPO SIN OPERARIOS Y DE EFECTOS PERSONALES Y ENSERES DOMÉSTICOS</option>
+<option value="72 - Informática y actividades conexas">72 - Informática y actividades conexas</option>
+<option value="74 - OTRAS ACTIVIDADES EMPRESARIALES">74 - OTRAS ACTIVIDADES EMPRESARIALES</option>
+<option value="75 - Administración Pública y Defensa; Planes de Seguridad Social de Afiliación Obligatoria">75 - Administración Pública y Defensa; Planes de Seguridad Social de Afiliación Obligatoria</option>
+<option value="85 - SERVICIOS SOCIALES Y DE SALUD - Privados">85 - SERVICIOS SOCIALES Y DE SALUD - Privados</option>
+<option value="85 - SERVICIOS SOCIALES Y DE SALUD - Públicos">85 - SERVICIOS SOCIALES Y DE SALUD - Públicos</option>
+<option value="900 - Eliminación de desperdicios y aguas residuales, saneamiento y servicios similares">900 - Eliminación de desperdicios y aguas residuales, saneamiento y servicios similares</option>
+<option value="919 - Servicios de asociaciones n.c.p.">919 - Servicios de asociaciones n.c.p.</option>
+<option value="92 - ACTIVIDADES DE ESPARCIMIENTO Y ACTIVIDADES CULTURALES Y DEPORTIVAS">92 - ACTIVIDADES DE ESPARCIMIENTO Y ACTIVIDADES CULTURALES Y DEPORTIVAS</option>
+<option value="930 - Otras actividades de servicios">930 - Otras actividades de servicios</option>
+<option value="950 - Servicios de hogares privados que contratan servicio doméstico">950 - Servicios de hogares privados que contratan servicio doméstico</option>
+<option value="AJUSTE CIF/FOB DE LAS IMPORTACIONES">AJUSTE CIF/FOB DE LAS IMPORTACIONES</option>
+<option value="COMISIONES POR SERVICIOS DE CAMBIO DE DIVISAS">COMISIONES POR SERVICIOS DE CAMBIO DE DIVISAS</option>
+<option value="DERECHOS DE IMPORTACIÓN">DERECHOS DE IMPORTACIÓN</option>
+<option value="Enseñanza Privada - Adultos y otros servicios de enseñanza">Enseñanza Privada - Adultos y otros servicios de enseñanza</option>
+<option value="Enseñanza Pública - Todos los niveles">Enseñanza Pública - Todos los niveles</option>
+<option value="EXPORTACIONES">EXPORTACIONES</option>
+<option value="FORMACIÓN BRUTA DE CAPITAL FJO">FORMACIÓN BRUTA DE CAPITAL FJO</option>
+<option value="GASTO DE CONSUMO FINAL DE LOS HOGARES Y DE LAS ISFLSH">GASTO DE CONSUMO FINAL DE LOS HOGARES Y DE LAS ISFLSH</option>
+<option value="GASTO DE CONSUMO FNAL DEL GOBIERNO (individual y colectivo)">GASTO DE CONSUMO FNAL DEL GOBIERNO (individual y colectivo)</option>
+<option value="IMPORTACIONES  (CIF a nivel de producto y FOB a nivel total)">IMPORTACIONES  (CIF a nivel de producto y FOB a nivel total)</option>
+<option value="IMPUESTO AL VALOR AGREGADO NO DEDUCIBLE">IMPUESTO AL VALOR AGREGADO NO DEDUCIBLE</option>
+<option value="IMPUESTOS A LOS PRODUCTOS NETOS DE SUBSIDIOS">IMPUESTOS A LOS PRODUCTOS NETOS DE SUBSIDIOS</option>
+<option value="MÁRGENES DE DISTRIBUCIÓN">MÁRGENES DE DISTRIBUCIÓN</option>
+<option value="OBJETOS VALIOSOS">OBJETOS VALIOSOS</option>
+<option value="Servicios de Investigación y Desarrollo - PRIVADO">Servicios de Investigación y Desarrollo - PRIVADO</option>
+<option value="Servicios de Investigación y Desarrollo - PUBLICO">Servicios de Investigación y Desarrollo - PUBLICO</option>
+<option value="VARIACIÓN DE EXISTENCIAS">VARIACIÓN DE EXISTENCIAS</option></select>
+<script type="application/json" data-for="actividad" data-nonempty="">{"plugins":["selectize-plugin-a11y"]}</script>
+</div>
+</div>
+</div>
+<div class="cell-output-display">
+<span class="help-block">
+Definiciones usadas en este mockup:
+<ul>
+<li>OFERTA = Cuadro == 'Oferta' AND Área.transaccional == 'Producción / Consumo intermedio' AND No..Cuadro == 1 (VBP)</li>
+<li>UTILIZACIÓN = Cuadro == 'Utilización' AND Área.transaccional == 'Producción / Consumo intermedio' AND No..Cuadro == 2 (CI)</li>
+<li>VA = VBP - CI (se calcula, aunque exista precalculado en 'Valor Agregado')</li>
+</ul>
+</span>
+</div>
+</div></aside>
+<button class="collapse-toggle" type="button" title="Toggle sidebar" aria-expanded="true" aria-controls="bslib-sidebar-1">
+    <svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 16 16" class="bi bi-chevron-left collapse-icon" style="fill:currentColor;" aria-hidden="true" role="img">
+      <path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"></path>
+    </svg>
+</button>
+<script data-bslib-sidebar-init="">
+bslib.Sidebar.initCollapsibleAll()
+</script>
+</div><div class="bslib-grid" style="display: grid; grid-template-columns: minmax(3em, 1fr) minmax(3em, 1fr);
+grid-auto-rows: minmax(0, 1fr);">
+<div class="column" style="width:48%;">
+<div class="bslib-grid" style="display: grid; grid-template-columns: minmax(3em, 1fr) minmax(3em, 1fr);
+grid-auto-rows: minmax(0, 1fr);">
+<div class="card cell bslib-card html-fill-container" data-bslib-card-init="" data-require-bs-caller="card()" data-full-screen="false">
+<div class="card-body html-fill-item html-fill-container">
+<div class="cell-output-display html-fill-item html-fill-container">
+<div class="shiny-plot-output html-fill-item html-fill-container" id="out45bfaeb10d099dc7" style="width:100%;height:400px;"></div>
+</div>
+</div>
+<bslib-tooltip placement="auto" bsoptions="[]" data-require-bs-version="5" data-require-bs-caller="tooltip()">
+    <template>Expand</template>
+    <span class="bslib-full-screen-enter badge rounded-pill">
+        <svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 24 24" style="height:1em;width:1em;" aria-hidden="true" role="img"><path d="M20 5C20 4.4 19.6 4 19 4H13C12.4 4 12 3.6 12 3C12 2.4 12.4 2 13 2H21C21.6 2 22 2.4 22 3V11C22 11.6 21.6 12 21 12C20.4 12 20 11.6 20 11V5ZM4 19C4 19.6 4.4 20 5 20H11C11.6 20 12 20.4 12 21C12 21.6 11.6 22 11 22H3C2.4 22 2 21.6 2 21V13C2 12.4 2.4 12 3 12C3.6 12 4 12.4 4 13V19Z"></path></svg>
+    </span>
+</bslib-tooltip><script data-bslib-card-init="">bslib.Card.initializeAllCards();</script></div><div class="card cell bslib-card html-fill-container" data-bslib-card-init="" data-require-bs-caller="card()" data-full-screen="false">
+<div class="card-body html-fill-item html-fill-container">
+<div class="cell-output-display html-fill-item html-fill-container no-overflow-x">
+<div class="shiny-html-output gt_shiny html-fill-item html-fill-container" id="outbc0752e4357ddf07"></div>
+</div>
+</div>
+<bslib-tooltip placement="auto" bsoptions="[]" data-require-bs-version="5" data-require-bs-caller="tooltip()">
+    <template>Expand</template>
+    <span class="bslib-full-screen-enter badge rounded-pill">
+        <svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 24 24" style="height:1em;width:1em;" aria-hidden="true" role="img"><path d="M20 5C20 4.4 19.6 4 19 4H13C12.4 4 12 3.6 12 3C12 2.4 12.4 2 13 2H21C21.6 2 22 2.4 22 3V11C22 11.6 21.6 12 21 12C20.4 12 20 11.6 20 11V5ZM4 19C4 19.6 4.4 20 5 20H11C11.6 20 12 20.4 12 21C12 21.6 11.6 22 11 22H3C2.4 22 2 21.6 2 21V13C2 12.4 2.4 12 3 12C3.6 12 4 12.4 4 13V19Z"></path></svg>
+    </span>
+</bslib-tooltip><script data-bslib-card-init="">bslib.Card.initializeAllCards();</script></div>
+</div>
+</div><div class="column" style="width:48%;">
+<div class="bslib-grid" style="display: grid; grid-template-columns: minmax(3em, 1fr) minmax(3em, 1fr);
+grid-auto-rows: minmax(0, 1fr);">
+<div class="card cell bslib-card html-fill-container" data-bslib-card-init="" data-require-bs-caller="card()" data-full-screen="false">
+<div class="card-body html-fill-item html-fill-container">
+<div class="cell-output-display html-fill-item html-fill-container">
+<div class="shiny-plot-output html-fill-item html-fill-container" id="outb979be4770a4b649" style="width:100%;height:400px;"></div>
+</div>
+</div>
+<bslib-tooltip placement="auto" bsoptions="[]" data-require-bs-version="5" data-require-bs-caller="tooltip()">
+    <template>Expand</template>
+    <span class="bslib-full-screen-enter badge rounded-pill">
+        <svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 24 24" style="height:1em;width:1em;" aria-hidden="true" role="img"><path d="M20 5C20 4.4 19.6 4 19 4H13C12.4 4 12 3.6 12 3C12 2.4 12.4 2 13 2H21C21.6 2 22 2.4 22 3V11C22 11.6 21.6 12 21 12C20.4 12 20 11.6 20 11V5ZM4 19C4 19.6 4.4 20 5 20H11C11.6 20 12 20.4 12 21C12 21.6 11.6 22 11 22H3C2.4 22 2 21.6 2 21V13C2 12.4 2.4 12 3 12C3.6 12 4 12.4 4 13V19Z"></path></svg>
+    </span>
+</bslib-tooltip><script data-bslib-card-init="">bslib.Card.initializeAllCards();</script></div><div class="card cell bslib-card html-fill-container" data-bslib-card-init="" data-require-bs-caller="card()" data-full-screen="false">
+<div class="card-body html-fill-item html-fill-container">
+<div class="cell-output-display html-fill-item html-fill-container no-overflow-x">
+<div class="shiny-html-output gt_shiny html-fill-item html-fill-container" id="outfe7e04dcf99011ea"></div>
+</div>
+</div>
+<bslib-tooltip placement="auto" bsoptions="[]" data-require-bs-version="5" data-require-bs-caller="tooltip()">
+    <template>Expand</template>
+    <span class="bslib-full-screen-enter badge rounded-pill">
+        <svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 24 24" style="height:1em;width:1em;" aria-hidden="true" role="img"><path d="M20 5C20 4.4 19.6 4 19 4H13C12.4 4 12 3.6 12 3C12 2.4 12.4 2 13 2H21C21.6 2 22 2.4 22 3V11C22 11.6 21.6 12 21 12C20.4 12 20 11.6 20 11V5ZM4 19C4 19.6 4.4 20 5 20H11C11.6 20 12 20.4 12 21C12 21.6 11.6 22 11 22H3C2.4 22 2 21.6 2 21V13C2 12.4 2.4 12 3 12C3.6 12 4 12.4 4 13V19Z"></path></svg>
+    </span>
+</bslib-tooltip><script data-bslib-card-init="">bslib.Card.initializeAllCards();</script></div>
+</div>
+</div>
+</div><div class="bslib-grid" style="display: grid; grid-template-columns: minmax(3em, 1fr) minmax(3em, 1fr) minmax(3em, 1fr);
+grid-auto-rows: minmax(0, 1fr);">
+<div class="card cell bslib-card html-fill-container" data-bslib-card-init="" data-require-bs-caller="card()" data-full-screen="false">
+<div class="card-body html-fill-item html-fill-container">
+<div class="cell-output-display html-fill-item html-fill-container no-overflow-x">
+<div class="shiny-html-output gt_shiny html-fill-item html-fill-container" id="out721f5cf7120933ad"></div>
+</div>
+</div>
+<bslib-tooltip placement="auto" bsoptions="[]" data-require-bs-version="5" data-require-bs-caller="tooltip()">
+    <template>Expand</template>
+    <span class="bslib-full-screen-enter badge rounded-pill">
+        <svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 24 24" style="height:1em;width:1em;" aria-hidden="true" role="img"><path d="M20 5C20 4.4 19.6 4 19 4H13C12.4 4 12 3.6 12 3C12 2.4 12.4 2 13 2H21C21.6 2 22 2.4 22 3V11C22 11.6 21.6 12 21 12C20.4 12 20 11.6 20 11V5ZM4 19C4 19.6 4.4 20 5 20H11C11.6 20 12 20.4 12 21C12 21.6 11.6 22 11 22H3C2.4 22 2 21.6 2 21V13C2 12.4 2.4 12 3 12C3.6 12 4 12.4 4 13V19Z"></path></svg>
+    </span>
+</bslib-tooltip><script data-bslib-card-init="">bslib.Card.initializeAllCards();</script></div><div class="card cell bslib-card html-fill-container" data-bslib-card-init="" data-require-bs-caller="card()" data-full-screen="false">
+<div class="card-body html-fill-item html-fill-container">
+<div class="cell-output-display html-fill-item html-fill-container no-overflow-x">
+<div class="shiny-html-output gt_shiny html-fill-item html-fill-container" id="outfc777be00623a188"></div>
+</div>
+</div>
+<bslib-tooltip placement="auto" bsoptions="[]" data-require-bs-version="5" data-require-bs-caller="tooltip()">
+    <template>Expand</template>
+    <span class="bslib-full-screen-enter badge rounded-pill">
+        <svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 24 24" style="height:1em;width:1em;" aria-hidden="true" role="img"><path d="M20 5C20 4.4 19.6 4 19 4H13C12.4 4 12 3.6 12 3C12 2.4 12.4 2 13 2H21C21.6 2 22 2.4 22 3V11C22 11.6 21.6 12 21 12C20.4 12 20 11.6 20 11V5ZM4 19C4 19.6 4.4 20 5 20H11C11.6 20 12 20.4 12 21C12 21.6 11.6 22 11 22H3C2.4 22 2 21.6 2 21V13C2 12.4 2.4 12 3 12C3.6 12 4 12.4 4 13V19Z"></path></svg>
+    </span>
+</bslib-tooltip><script data-bslib-card-init="">bslib.Card.initializeAllCards();</script></div><div class="card bslib-card html-fill-container" data-fill="false" data-bslib-card-init="" data-require-bs-caller="card()" data-full-screen="false">
+<div class="card-body html-fill-item html-fill-container">
+<hr>
+</div>
+<bslib-tooltip placement="auto" bsoptions="[]" data-require-bs-version="5" data-require-bs-caller="tooltip()">
+    <template>Expand</template>
+    <span class="bslib-full-screen-enter badge rounded-pill">
+        <svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 24 24" style="height:1em;width:1em;" aria-hidden="true" role="img"><path d="M20 5C20 4.4 19.6 4 19 4H13C12.4 4 12 3.6 12 3C12 2.4 12.4 2 13 2H21C21.6 2 22 2.4 22 3V11C22 11.6 21.6 12 21 12C20.4 12 20 11.6 20 11V5ZM4 19C4 19.6 4.4 20 5 20H11C11.6 20 12 20.4 12 21C12 21.6 11.6 22 11 22H3C2.4 22 2 21.6 2 21V13C2 12.4 2.4 12 3 12C3.6 12 4 12.4 4 13V19Z"></path></svg>
+    </span>
+</bslib-tooltip><script data-bslib-card-init="">bslib.Card.initializeAllCards();</script></div>
+</div><div class="bslib-grid" style="display: grid; grid-template-columns: minmax(3em, 1fr);
+grid-auto-rows: minmax(0, 1fr);">
+<div class="card bslib-card html-fill-container" data-fill="false" data-bslib-card-init="" data-require-bs-caller="card()" data-full-screen="false">
+<div class="card-body html-fill-item html-fill-container">
+<ul>
+<li><strong>Quarto estático</strong>: perfecto para “lámina” reproducible; sin dropdown nativo.</li>
+<li><strong>Quarto + <code>runtime: shiny</code> (este archivo)</strong>: te da <strong>dropdown y reactividad</strong> dentro del <code>.qmd</code>.</li>
+<li><strong>Shiny puro</strong>: mejor si esto se vuelve una app grande con navegación y performance.</li>
+</ul>
+<p><strong>Recomendación:</strong> para demo y circulación interna → <em>Quarto + runtime shiny</em>. Para producto final → evaluar migración a Shiny “formal”.</p>
+</div>
+<bslib-tooltip placement="auto" bsoptions="[]" data-require-bs-version="5" data-require-bs-caller="tooltip()">
+    <template>Expand</template>
+    <span class="bslib-full-screen-enter badge rounded-pill">
+        <svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 24 24" style="height:1em;width:1em;" aria-hidden="true" role="img"><path d="M20 5C20 4.4 19.6 4 19 4H13C12.4 4 12 3.6 12 3C12 2.4 12.4 2 13 2H21C21.6 2 22 2.4 22 3V11C22 11.6 21.6 12 21 12C20.4 12 20 11.6 20 11V5ZM4 19C4 19.6 4.4 20 5 20H11C11.6 20 12 20.4 12 21C12 21.6 11.6 22 11 22H3C2.4 22 2 21.6 2 21V13C2 12.4 2.4 12 3 12C3.6 12 4 12.4 4 13V19Z"></path></svg>
+    </span>
+</bslib-tooltip><script data-bslib-card-init="">bslib.Card.initializeAllCards();</script></div><div id="3ade8a4a-fb1d-4a6c-8409-ac45482d5fc9" class="hidden">
+
+</div>
+</div>
+</div>
+
+
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+<script type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (_event) {
+  if (window.bslib.Card) {
+    window.bslib.Card.initializeAllCards();
+  }
+}); 
+</script>
+  
+
+
+
+</body></html>

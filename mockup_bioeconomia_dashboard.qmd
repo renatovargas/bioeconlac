@@ -1,0 +1,230 @@
+---
+title: "Mockup Bioeconomía (Dashboard)"
+format:
+  dashboard:
+    orientation: columns
+    theme: cosmo
+runtime: shiny
+execute:
+  echo: false
+  warning: false
+  message: false
+---
+
+```{r}
+# Paquetes
+library(shiny)
+library(readr)
+library(dplyr)
+library(stringr)
+library(ggplot2)
+library(gt)
+library(scales)
+```
+
+```{r}
+# --- Cargar CSV (ruta relativa al .qmd) ---
+# Si tu archivo se llama distinto, cambia aquí:
+data <- read_csv("ARG_db.csv", show_col_types = FALSE) |>
+  filter(Año == 2021)
+
+# --- Helpers ---
+pick_col <- function(df, candidates) {
+  hit <- candidates[candidates %in% names(df)]
+  if (length(hit) == 0) stop("No encontré ninguna de estas columnas: ", paste(candidates, collapse = ", "))
+  hit[[1]]
+}
+
+fmt_m <- function(x) round(x, 1)
+
+# Columnas (por si quedaron truncadas/renombradas)
+bio_col <- "Clasificación.Bioeconomí"
+
+
+act_col <- pick_col(
+  data,
+  c("Descripción.Actividades", "Descripción Actividades")
+)
+```
+
+## Controles
+
+::: {.sidebar}
+```{r}
+choices_act <- sort(unique(data[[act_col]]))
+
+selectInput(
+  inputId = "actividad",
+  label = "Actividad económica (Descripción Actividades)",
+  choices = choices_act,
+  selected = choices_act[[1]],
+  width = "100%"
+)
+
+helpText(
+  "Definiciones usadas en este mockup:",
+  tags$ul(
+    tags$li("OFERTA = Cuadro == 'Oferta' AND Área.transaccional == 'Producción / Consumo intermedio' AND No..Cuadro == 1 (VBP)"),
+    tags$li("UTILIZACIÓN = Cuadro == 'Utilización' AND Área.transaccional == 'Producción / Consumo intermedio' AND No..Cuadro == 2 (CI)"),
+    tags$li("VA = VBP - CI (se calcula, aunque exista precalculado en 'Valor Agregado')")
+  )
+)
+```
+:::
+
+```{r}
+# --- Datos filtrados por actividad seleccionada ---
+df <- reactive({
+  data |>
+    filter(.data[[act_col]] == input$actividad) |>
+    mutate(
+      categoria = str_squish(as.character(.data[[bio_col]])),
+      Cuadro = str_squish(Cuadro),
+      Área.transaccional = str_squish(Área.transaccional),
+      Valor = as.numeric(Valor),
+      valor_m = Valor / 1e6
+    )
+})
+
+# --- VBP (Oferta) y CI (Utilización) por categoría ---
+vbp_by_cat <- reactive({
+  df() |>
+    filter(
+      Cuadro == "Oferta",
+      Área.transaccional == "Producción / Consumo intermedio",
+      No..Cuadro == 1
+    ) |>
+    group_by(categoria) |>
+    summarise(vbp_m = sum(valor_m, na.rm = TRUE), .groups = "drop") |>
+    mutate(pct = vbp_m / sum(vbp_m))
+})
+
+ci_by_cat <- reactive({
+  df() |>
+    filter(
+      Cuadro == "Utilización",
+      Área.transaccional == "Producción / Consumo intermedio",
+      No..Cuadro == 2
+    ) |>
+    group_by(categoria) |>
+    summarise(ci_m = sum(valor_m, na.rm = TRUE), .groups = "drop") |>
+    mutate(pct = ci_m / sum(ci_m))
+})
+
+# Totales
+vbp_total <- reactive(sum(vbp_by_cat()$vbp_m, na.rm = TRUE))
+ci_total  <- reactive(sum(ci_by_cat()$ci_m,  na.rm = TRUE))
+va_total  <- reactive(vbp_total() - ci_total())
+
+# VA por categoría (derivado)
+va_by_cat <- reactive({
+  full_join(vbp_by_cat(), ci_by_cat(), by = "categoria") |>
+    transmute(
+      categoria,
+      va_m = coalesce(vbp_m, 0) - coalesce(ci_m, 0)
+    ) |>
+    arrange(desc(va_m))
+})
+
+# --- Pie chart helper ---
+pie_plot <- function(dat, value_col, title_text){
+  ggplot(dat, aes(x = "", y = .data[[value_col]], fill = categoria)) +
+    geom_col(width = 1, color = "white") +
+    coord_polar(theta = "y") +
+    geom_text(
+      aes(label = percent(.data[["pct"]], accuracy = 1)),
+      position = position_stack(vjust = 0.5),
+      color = "white",
+      size = 6
+    ) +
+    labs(title = title_text) +
+    theme_void(base_size = 14) +
+    theme(legend.position = "bottom")
+}
+```
+
+::: {.columns}
+
+::: {.column width="48%"}
+## OFERTA
+
+```{r}
+renderPlot({
+  req(nrow(vbp_by_cat()) > 0)
+  pie_plot(vbp_by_cat(), "vbp_m", "OFERTA")
+})
+```
+
+```{r}
+render_gt({
+  req(nrow(vbp_by_cat()) > 0)
+  tab <- vbp_by_cat() |>
+    arrange(desc(vbp_m)) |>
+    mutate(`Millones de GTQ` = fmt_m(vbp_m)) |>
+    select(Oferta = categoria, `Millones de GTQ`) |>
+    bind_rows(tibble(Oferta = "Total", `Millones de GTQ` = fmt_m(vbp_total())))
+  gt(tab)
+})
+```
+:::
+
+::: {.column width="48%"}
+## UTILIZACIÓN
+
+```{r}
+renderPlot({
+  req(nrow(ci_by_cat()) > 0)
+  pie_plot(ci_by_cat(), "ci_m", "UTILIZACIÓN")
+})
+```
+
+```{r}
+render_gt({
+  req(nrow(ci_by_cat()) > 0)
+  tab <- ci_by_cat() |>
+    arrange(desc(ci_m)) |>
+    mutate(`Millones de GTQ` = fmt_m(ci_m)) |>
+    select(Utilización = categoria, `Millones de GTQ`) |>
+    bind_rows(tibble(Utilización = "Total", `Millones de GTQ` = fmt_m(ci_total())))
+  gt(tab)
+})
+```
+:::
+
+:::
+
+## VALOR AGREGADO
+
+```{r}
+render_gt({
+  tab1 <- tibble(
+    Transacción = c(
+      "A. Valor Bruto de Producción",
+      "B. Consumo intermedio",
+      "C. Valor Agregado Bruto (A-B)"
+    ),
+    `M. GTQ` = fmt_m(c(vbp_total(), ci_total(), va_total()))
+  )
+  gt(tab1)
+})
+```
+
+```{r}
+render_gt({
+  tab2 <- va_by_cat() |>
+    mutate(`M. GTQ` = fmt_m(va_m)) |>
+    select(Transacción = categoria, `M. GTQ`) |>
+    bind_rows(tibble(Transacción = "Valor Agregado Total", `M. GTQ` = fmt_m(va_total())))
+  gt(tab2)
+})
+```
+
+---
+
+## ¿Shiny o Quarto para el mockup?
+
+- **Quarto estático**: perfecto para “lámina” reproducible; sin dropdown nativo.
+- **Quarto + `runtime: shiny` (este archivo)**: te da **dropdown y reactividad** dentro del `.qmd`.
+- **Shiny puro**: mejor si esto se vuelve una app grande con navegación y performance.
+
+**Recomendación:** para demo y circulación interna → *Quarto + runtime shiny*. Para producto final → evaluar migración a Shiny “formal”.
