@@ -1,2 +1,30 @@
 /.quarto/
 **/*.quarto_ipynb
+
+# --- Project Specifics ---
+# Ignore the environment variable file containing local paths
+.Renviron
+
+# Ignore any DuckDB database files if they ever end up in the repo
+*.duckdb
+*.duckdb.wal
+
+# Ignore the rendered website output
+/_site/
+/.quarto/
+
+# --- R Specifics ---
+.Rhistory
+.RData
+.Ruserdata
+.Rproj.user/
+
+# --- Data Specifics ---
+# Even though data is outside the repo, this is a safety net
+# in case you accidentally create a /data/ folder inside the repo.
+/data/
+/output/
+
+# --- OS Specifics ---
+.DS_Store
+Thumbs.db

@@ -4,14 +4,17 @@ project:
   execute-dir: project
 
 website:
-  title: "Base de datos de Cuentas Nacionales para la Bioeconomía"
+  title: "SIBIO"
   navbar:
     left:
       - href: index.qmd
-        text: Home
-      - href: about.qmd
+        text: Inicio
+      - href: documentos/
+        text: Documentos
+      - href: acerca.qmd
         text: Acerca
 
+lang: es
 format:
   html:
     theme:

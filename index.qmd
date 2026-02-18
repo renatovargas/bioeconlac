@@ -1,7 +1,7 @@
 ---
-title: "Base de datos de Cuentas Nacionales para la Bioeconomía"
+title: "Sistema Integrado de Información Macroeconómica sobre Bioeconomía (SIBIO)"
 ---
 
-This is a Quarto website.
+Este es un sitio de Quarto.
 
-To learn more about Quarto websites visit <https://quarto.org/docs/websites>.
+Para aprender más sobre sitios de Quarto, visite: <https://quarto.org/docs/websites>.
