@@ -1,0 +1,4 @@
+iso3,year,lookup_version,quadrant,target_table,file_name,sheet_name,cell_range,exclude_rows,exclude_columns
+PAN,2018,pan_lookup_v02.xlsx,OFERTA DE PRODUCTOS A PRECIOS DE COMPRADOR,supply,PAN_COU_Corr_2018.xlsx,Oferta,C12:DF208,,"75,79,90,91,94,96,101"
+PAN,2018,pan_lookup_v02.xlsx,UTILIZACIÓN DE PRODUCTOS A PRECIOS DE COMPRADOR,use,PAN_COU_Corr_2018.xlsx,Utilización,C12:DG208,,
+PAN,2018,pan_lookup_v02.xlsx,VALOR AGREGADO BRUTO TOTAL/PIB,value_added,PAN_COU_Corr_2018.xlsx,Utilización,C210:CO210,"2,3,5",
