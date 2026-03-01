@@ -1,0 +1,4 @@
+iso3,year,lookup_version,quadrant,target_table,file_name,sheet_name,cell_range,excl_rows,excl_cols
+PAN,2021,V01,oferta,SUPPLY,SUT_PAN_2021.xlsx,Cuadro_1,C10:BK150,,
+PAN,2021,V01,utilizacion,USE,SUT_PAN_2021.xlsx,Cuadro_2,C10:BK150,,
+PAN,2021,V01,va,VALUE_ADDED,SUT_PAN_2021.xlsx,Cuadro_3,D20:DK29,"2,3,5",
