@@ -21,7 +21,7 @@ parse_indices <- function(x) {
 extract_sut_quadrant <- function(row) {
   # Build path using the ENV variable
   base_path <- get_base_path()
-  full_path <- file.path(base_path, tolower(row$iso3), "raw", row$file_name)
+  full_path <- file.path(base_path, tolower(row$iso3), "sut", row$file_name)
 
   if (!file.exists(full_path)) {
     stop(paste("File missing:", full_path))
@@ -72,12 +72,11 @@ extract_sut_quadrant <- function(row) {
   return(processed)
 }
 
-# Dimension loader updated for external path
-load_dimension_table <- function(iso3, version, type = "Rows") {
-  base_path <- get_base_path()
+# Dimension loader updated for repo-relative path
+load_dimension_table <- function(iso3, version, type) {
   file_name <- paste0(toupper(iso3), "_", version, "_Lookups.xlsx")
-  lookup_path <- file.path(base_path, tolower(iso3), "lookups", file_name)
-  sheet_to_read <- paste0(type, "_Final")
+  lookup_path <- file.path("inputs", "lookups", tolower(iso3), file_name)
+  sheet_to_read <- tolower(type)
 
   read_excel(lookup_path, sheet = sheet_to_read)
 }
