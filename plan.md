@@ -4,16 +4,21 @@
 
 The current `pipeline_engine.R` and `main_run.R` were adapted by a collaborator
 from Renato's original single-country workflow (`procesar_cuadrante.R`,
-`procesar_cou.R`, `05-procesamiento-con-funciones.R`). The manifest idea and
+`procesar_cou.R`, `05-procesamiento-con-funciones.R`). The config idea and
 DuckDB store are good additions, but the implementation drifted from the
 original's clarity and introduced fragility. This plan describes a clean rewrite
 that preserves the good ideas and discards the rest.
+
+> **Terminology note:** What the collaborator called "manifests" are called
+> **configs** throughout this project — consistent with Renato's original
+> naming convention. The folder is `configs/`, the files are `config_pan.csv`,
+> and the variable in code is `config` / `config_files`.
 
 ---
 
 ## What to Keep
 
-- **Manifest CSVs** in `manifests/` — one per country, documents every quadrant
+- **Config CSVs** in `configs/` — one per country, documents every quadrant
   extraction explicitly. Better than a hardcoded list.
 - **DuckDB** as the master multi-country store — the single source of truth for
   all countries and all years, used for dashboards and APIs.
@@ -30,26 +35,48 @@ that preserves the good ideas and discards the rest.
 `pipeline_engine.R` and `main_run.R` are renamed for clarity:
 
 ```
-scripts/sut_functions.R   ← pure functions only (no library() calls)
-scripts/run_pipeline.R    ← orchestration script you actually execute
+scripts/sut_functions.R   <- pure functions only (no library() calls)
+scripts/run_pipeline.R    <- orchestration script you actually execute
 ```
 
 `sut_functions.R` is self-documenting — anyone opening the repo knows exactly
 what's in it. `run_pipeline.R` is imperative — it's the thing you run.
 
-### 2. Manifest: clean `lookup_version` and add `year`
+### 2. Config: slim down to year-specific columns only
 
-Two changes to the manifest CSV:
+The config CSV should contain only what is irreducibly year-specific. Everything
+fixed by the lookup version belongs in the lookup `quadrants` metadata sheet.
 
-- `lookup_version` currently holds a filename (`pan_lookup_v02.xlsx`) instead of
-  a clean version string. It should be a plain token like `v02`. The lookup
-  filename will be constructed in code from `iso3` + `lookup_version`.
-- `year` must be an explicit column. SUT tables are always year-specific and the
-  entire purpose of this pipeline is to stack multiple years into a single flat
-  database. Easier to add now than retrofit later.
+**Config columns:**
 
-**Action:** Update manifest CSVs so `lookup_version` = `v02` and add a `year`
-column to every row.
+| Column | Description |
+|---|---|
+| `iso3` | Country code |
+| `year` | Reference year of the source Excel file |
+| `lookup_version` | Clean version token e.g. `v02` (not a filename) |
+| `quadrant_code` | Short key e.g. `q01` — joins to the `quadrants` sheet in the lookup |
+| `quadrant` | Human-readable label from the source file (documentation only) |
+| `file_name` | Source Excel filename — the only thing that truly changes year to year |
+
+`quadrant` in the config is kept for documentation and cross-reference, but the
+**authoritative value is in the lookup `quadrants` sheet**. At load time the
+pipeline checks that both match and warns if they do not, then drops the config
+copy.
+
+`sheet_name`, `cell_range`, `excl_rows`, and `excl_cols` move to the lookup
+`quadrants` sheet — they are properties of the classification version's table
+layout, not the year. If any of these change, a new lookup version should be
+created.
+
+**Example `config_pan.csv`:**
+
+```
+iso3,year,lookup_version,quadrant_code,quadrant,file_name
+PAN,2018,v02,q01,OFERTA DE PRODUCTOS A PRECIOS DE COMPRADOR,PAN_COU_Corr_2018.xlsx
+PAN,2018,v02,q02,UTILIZACION DE PRODUCTOS A PRECIOS DE COMPRADOR,PAN_COU_Corr_2018.xlsx
+PAN,2019,v02,q01,OFERTA DE PRODUCTOS A PRECIOS DE COMPRADOR,PAN_COU_Corr_2019.xlsx
+PAN,2019,v02,q02,UTILIZACION DE PRODUCTOS A PRECIOS DE COMPRADOR,PAN_COU_Corr_2019.xlsx
+```
 
 ### 3. `sut_functions.R`: rewrite close to original style
 
@@ -58,21 +85,20 @@ The rewrite should:
 - Mirror `procesar_cuadrante()` closely — same argument names where sensible,
   same step-by-step structure.
 - Use tidyverse consistently.
-- Remove `parse_indices()` — replace with a simpler `parse_excl()` helper that
-  handles `NA`, `""`, `"0"`, `"none"` safely using `all(is.na(x))` + `nchar()`
-  checks, not a fragile scalar `if` chain.
+- Replace `parse_indices()` with `parse_excl()` — handles `NA`, `""`, `"0"`,
+  `"none"` safely.
 - Keep `get_base_path()` for reading `BIO_DATA_PATH` from `.Renviron`.
 - `load_dimension_table()` stays repo-relative, no default for `type`.
-- No `library()` calls inside `sut_functions.R` — libraries are loaded by
-  the caller (`run_pipeline.R`).
+- No `library()` calls inside `sut_functions.R`.
 
 **Function inventory for `sut_functions.R`:**
 
 ```
-get_base_path()          — reads BIO_DATA_PATH from environment
-parse_excl()             — safely parse a scalar exclusion string → integer(0)
-extract_sut_quadrant()   — processes one manifest row → long tidy tibble
-load_dimension_table()   — reads rows/columns lookup sheet from repo
+get_base_path()          - reads BIO_DATA_PATH from environment
+parse_excl()             - safely parse a scalar exclusion string to integer(0)
+load_quadrant_meta()     - reads the quadrants metadata sheet from the lookup file
+extract_sut_quadrant()   - processes one config row + metadata -> long tidy tibble
+load_dimension_table()   - reads rows/columns lookup sheet from repo
 ```
 
 ### 4. `run_pipeline.R`: rewrite as a clean orchestration script
@@ -80,55 +106,45 @@ load_dimension_table()   — reads rows/columns lookup sheet from repo
 Structure mirrors `05-procesamiento-con-funciones.R` in spirit:
 
 ```
-1. SETUP       — source sut_functions.R, load libraries, get base_data_path
-2. DISCOVER    — list manifest CSVs from manifests/
-3. DATABASE    — open DuckDB connection
-4. LOOP        — for each manifest:
-     A. Load manifest
-     B. Extract all quadrants → bind_rows → facts (includes year column)
-     C. Load row/column lookups
-     D. Join facts + lookups → national_flat
-     E. Upsert national_flat into DuckDB (DELETE matching iso3+year, then append)
-     F. Export per-country Excel from DuckDB for human inspection
-5. CLOSE       — disconnect DuckDB, message done
+1. SETUP       - source sut_functions.R, load libraries, get base_data_path
+2. DISCOVER    - list config CSVs from configs/
+3. DATABASE    - open DuckDB connection
+4. LOOP        - for each config:
+     A. Load config
+     B. Load quadrant metadata from lookup, join to config on quadrant_code
+        - stop() if any quadrant_code has no match in metadata
+        - warn() if quadrant label in config differs from metadata
+     C. Extract all quadrants -> bind_rows -> facts (includes year column)
+     D. Load row and column lookups
+     E. Join facts + lookups -> national_flat
+     F. Upsert into DuckDB (DELETE matching iso3+year, then append)
+     G. Export per-country Excel from DuckDB for human inspection
+5. CLOSE       - disconnect DuckDB, message done
 ```
 
-No `purrr` dependency for the main loop — use `lapply` + `bind_rows` as in the
-original, which is more readable for this use case.
+No `purrr` dependency for the main loop — use `lapply` + `bind_rows`.
 
 ### 5. Stable ID format — reference target table, not quadrant
-
-The quadrant (`mp`, `ot`, etc.) is a filing artifact of the source country's
-statistical office, not an economic dimension. Two quadrant files that both feed
-the supply table share the same set of rows and columns. Encoding the quadrant
-into the stable ID would create false duplicates in the lookup and break joins.
 
 Stable IDs encode: **country + lookup version + target table + dimension + sequence**:
 
 ```
-<iso3>_<version>_<target_table>_r001   ← row stable ID
-<iso3>_<version>_<target_table>_c001   ← column stable ID
+<iso3>_<version>_<target_table>_r0001   <- row stable ID
+<iso3>_<version>_<target_table>_c0001   <- column stable ID
 ```
 
-All lowercase, underscore-separated, zero-padded 3 digits.
+All lowercase, underscore-separated, zero-padded **4 digits**.
 
 **Target table tokens:** `supply`, `use`, `va`, `employment`
 
 **Examples:**
-- `pan_v02_supply_r001` — first row of Panama's supply table, lookup version 02
-- `pan_v02_supply_c001` — first column of Panama's supply table, lookup version 02
-- `pan_v02_use_r001`    — first row of Panama's use table
+- `pan_v02_supply_r0001` — first row of Panama supply table, lookup version 02
+- `pan_v02_supply_c0001` — first column of Panama supply table, lookup version 02
+- `pan_v02_use_r0001`    — first row of Panama use table
 
-The `lookup_version` in the stable ID refers to the **classification version**,
-not the year. A country might use `v02` lookups for years 2018–2021 and `v03`
-lookups for 2022 onward (when the statistical office revised their product list).
-The flat table will contain rows with different `lookup_version` values stacked —
-this is intentional and expected. Aggregation to international classifications
-(CPC, ISIC) handles the reconciliation.
-
-The manifest column `target_table` declares which table each quadrant file
-feeds into. `extract_sut_quadrant()` uses `target_table` (not `quadrant`) to
-construct stable IDs.
+The `lookup_version` in the stable ID is the classification version, not the
+year. The flat table will legitimately contain rows with different
+`lookup_version` values stacked. Aggregation to CPC/ISIC handles reconciliation.
 
 ### 6. Lookup file structure
 
@@ -138,67 +154,64 @@ inputs/lookups/<iso3>/<ISO3>_<version>_lookups.xlsx
 
 Example: `inputs/lookups/pan/PAN_v02_lookups.xlsx`
 
-**Two sheets: `rows` and `columns` (lowercase, no suffix).**
+**Three sheets: `quadrants`, `rows`, `columns` (all lowercase).**
 
-Each sheet covers all target tables for this version, stacked. The `table` and
-`table_code` columns are present in the lookup for human readability and correct
-ordering when users open the file in Excel — they are **not** the authoritative
-source of `target_table` in the pipeline.
-
-**Minimum columns expected in each sheet:**
+#### `quadrants` sheet — authoritative version layout metadata
 
 | Column | Description |
 |---|---|
-| `table_code` | Integer for ordering (e.g. `1` = supply, `2` = use, etc.) |
-| `table` | Human-readable target table name (`supply`, `use`, `va`, `employment`) |
+| `quadrant_code` | Short key (`q01`, `q02`) — foreign key from config |
+| `quadrant` | Human-readable label from source file (authoritative copy) |
+| `target_table` | `supply`, `use`, `va`, `employment` |
+| `sheet_name` | Sheet name in the source Excel |
+| `cell_range` | Cell range of the data rectangle |
+| `excl_rows` | Comma-separated row indices to exclude (totals, blanks, etc.) |
+| `excl_cols` | Comma-separated column indices to exclude |
+
+A failed join on `quadrant_code` is a hard `stop()` — extraction is undefined
+without metadata.
+
+The `quadrant` column in the config is checked against this sheet after the join.
+A mismatch triggers `warning()` but not a stop — it is documentation drift, not
+a structural error. The lookup value is kept; the config value is dropped.
+
+#### `rows` and `columns` sheets — dimension lookups
+
+Each covers all target tables for this version, stacked.
+
+**Minimum columns:**
+
+| Column | Description |
+|---|---|
+| `table_code` | Integer for ordering (`1` = supply, `2` = use, etc.) |
+| `table` | Target table name (`supply`, `use`, `va`, `employment`) |
 | `stable_id` | Must match the stable ID generated by `extract_sut_quadrant()` |
-| `original_code` | The code as it appears in the source Excel |
+| `original_code` | Code as it appears in the source Excel |
 | `label_es` | Spanish label |
 | `label_en` | English label |
 
 Additional classification columns (CPC, ISIC, bioeconomy flags, etc.) can be
 added freely — the join is on `stable_id` only.
 
-**`target_table` is authoritative in the manifest, not the lookup.**
-`extract_sut_quadrant()` reads `target_table` from the manifest row and:
-
-1. Uses it to construct stable IDs (`pan_v02_supply_r001`, etc.).
-2. Attaches `target_table` and `year` as explicit columns on every fact row.
-
-At join time, the lookup's `table` column is compared against the manifest-
-derived `target_table` as a **sanity check**:
-
-```r
-mismatches <- national_flat |>
-  filter(target_table != table.x | target_table != table.y)
-if (nrow(mismatches) > 0) warning("target_table mismatch between manifest and lookup")
-
-national_flat <- national_flat |>
-  select(-table.x, -table.y)   # drop redundant lookup columns, keep manifest-derived
-```
-
-A country with a standard two-file supply table (`mp` + `ot`) lists supply rows
-**once** in the lookup under `table = "supply"`. Both quadrant files generate
-row IDs from that same set.
+`target_table` is derived from the `quadrants` metadata sheet (authoritative).
+The `table` column in `rows`/`columns` is a sanity-check duplicate — compared
+after joining, warned on mismatch, then dropped.
 
 ### 7. Output structure
 
 The **DuckDB file is the master**. Per-country Excel files are derived exports
-for human inspection, not intermediate products. They are named by country only —
-not by lookup version, since a single country flat file will contain multiple
-years that may span multiple lookup versions.
+for human inspection, not intermediate products.
 
 ```
-# Master store — all countries, all years, append across pipeline runs
+# Master store — all countries, all years
 <BIO_DATA_PATH>/bioeconomy_latam.duckdb
 
 # Per-country export — all years for that country, regenerated each run
 <BIO_DATA_PATH>/pan/output/PAN_flat.xlsx
 ```
 
-Both live outside the repo (derived artifacts, potentially large). The Excel is
-written by querying DuckDB after the upsert, ensuring it always reflects the
-master store.
+Both live outside the repo. The Excel is written by querying DuckDB after the
+upsert, ensuring it always reflects the master store.
 
 ---
 
@@ -206,27 +219,26 @@ master store.
 
 ```
 bioeconlac/
-├── manifests/
-│   └── manifest_pan.csv          ← lookup_version = "v02", year column added
+├── configs/
+│   └── config_pan.csv             <- iso3, year, lookup_version, quadrant_code, quadrant, file_name
 ├── inputs/
 │   └── lookups/
 │       └── pan/
-│           └── PAN_v02_lookups.xlsx   ← sheets: rows, columns
+│           └── PAN_v02_lookups.xlsx   <- sheets: quadrants, rows, columns
 ├── scripts/
-│   ├── sut_functions.R           ← rewritten: functions only, no library()
-│   ├── run_pipeline.R            ← rewritten: orchestration loop
-│   ├── procesar_cuadrante.R      ← original, keep as reference
-│   ├── procesar_cou.R            ← original, keep as reference
-│   └── 05-procesamiento-con-funciones.R  ← original, keep as reference
+│   ├── sut_functions.R            <- rewritten: functions only, no library()
+│   ├── run_pipeline.R             <- rewritten: orchestration loop
+│   ├── procesar_cuadrante.R       <- original, keep as reference
+│   ├── procesar_cou.R             <- original, keep as reference
+│   └── 05-procesamiento-con-funciones.R  <- original, keep as reference
 ```
 
 ---
 
 ## Order of Work
 
-1. Update `manifests/manifest_pan.csv` — set `lookup_version` = `v02`, add `year`.
-2. Write `scripts/sut_functions.R`.
-3. Write `scripts/run_pipeline.R`.
-4. Create `inputs/lookups/pan/PAN_v02_lookups.xlsx` mockup with correct stable
-   IDs to test the join end-to-end.
+1. Update `configs/config_pan.csv` — slim to new columns, add `quadrant_code`.
+2. Update `inputs/lookups/pan/PAN_v02_lookups.xlsx` — add `quadrants` sheet.
+3. Rewrite `scripts/sut_functions.R`.
+4. Update `scripts/run_pipeline.R` to join quadrant metadata before extraction.
 5. Run end-to-end for Panama, verify output Excel and DuckDB table.

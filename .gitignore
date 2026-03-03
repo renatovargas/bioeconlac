@@ -28,3 +28,12 @@
 # --- OS Specifics ---
 .DS_Store
 Thumbs.db
+
+# --- Lock files (LibreOffice, Excel, Word) ---
+.~lock.*#
+~$*.xlsx
+~$*.xls
+~$*.docx
+~$*.doc
+~$*.pptx
+~$*.ppt

@@ -1,4 +1,4 @@
 iso3,year,lookup_version,quadrant,target_table,file_name,sheet_name,cell_range,excl_rows,excl_cols
-PAN,2021,V01,oferta,SUPPLY,SUT_PAN_2021.xlsx,Cuadro_1,C10:BK150,,
-PAN,2021,V01,utilizacion,USE,SUT_PAN_2021.xlsx,Cuadro_2,C10:BK150,,
-PAN,2021,V01,va,VALUE_ADDED,SUT_PAN_2021.xlsx,Cuadro_3,D20:DK29,"2,3,5",
+PAN,2018,v02,Oferta,supply,PAN_COU_Corr_2018.xlsx,Oferta,C12:DF208,,
+PAN,2018,v02,Utilización,use,PAN_COU_Corr_2018.xlsx,Utilización,C12:DG208,,
+PAN,2018,v02,Valor Agregado,value_added,PAN_COU_Corr_2018.xlsx,Utilización,C12:DG208,"2,3,5",

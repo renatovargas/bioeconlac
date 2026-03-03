@@ -32,15 +32,30 @@ parse_excl <- function(x) {
   as.integer(unlist(strsplit(x, ",")))
 }
 
+# ── Quadrant metadata loader ──────────────────────────────────────────────────
+
+# Loads the quadrants metadata sheet from the versioned lookup file.
+# Returns a data frame with one row per quadrant_code for this version.
+load_quadrant_meta <- function(iso3, version) {
+  file_name <- paste0(toupper(iso3), "_", version, "_lookups.xlsx")
+  lookup_path <- file.path("inputs", "lookups", tolower(iso3), file_name)
+  if (!file.exists(lookup_path)) {
+    stop("Lookup file missing: ", lookup_path)
+  }
+  read_excel(lookup_path, sheet = "quadrants")
+}
+
 # ── Core extraction ───────────────────────────────────────────────────────────
 
+# Processes one config row (already joined with quadrant metadata) into a
+# long tidy tibble of fact rows.
 extract_sut_quadrant <- function(row) {
-  # row: a single-row data frame from the manifest
+  # row: a single-row data frame with config + quadrant metadata columns
 
   base_path <- get_base_path()
   iso3 <- tolower(row$iso3)
   version <- row$lookup_version
-  target_table <- row$target_table
+  target_table <- row$target_table # from quadrant metadata (authoritative)
   year <- as.integer(row$year)
 
   # Resolve file path: <BIO_DATA_PATH>/<iso3>/sut/<file_name>
@@ -49,9 +64,9 @@ extract_sut_quadrant <- function(row) {
     stop("File missing: ", full_path)
   }
 
-  # Parse exclusions
-  excl_rows <- parse_excl(row$exclude_rows)
-  excl_cols <- parse_excl(row$exclude_cols)
+  # Parse exclusions (from quadrant metadata)
+  excl_rows <- parse_excl(row$excl_rows)
+  excl_cols <- parse_excl(row$excl_cols)
 
   # Read the data rectangle — all numeric
   datos <- read_excel(
@@ -94,7 +109,7 @@ extract_sut_quadrant <- function(row) {
     datos <- select(datos, -all_of(col_ids[excl_cols]))
   }
 
-  # Pivot longer → tidy fact rows
+  # Pivot longer -> tidy fact rows
   datos |>
     pivot_longer(
       cols = -row_id,
@@ -106,15 +121,16 @@ extract_sut_quadrant <- function(row) {
       year = year,
       lookup_version = version,
       target_table = target_table,
-      quadrant = row$quadrant,
+      quadrant_code = row$quadrant_code,
+      quadrant = row$quadrant, # authoritative label from metadata
       .before = 1
     )
 }
 
-# ── Lookup loader ─────────────────────────────────────────────────────────────
+# ── Dimension table loader ────────────────────────────────────────────────────
 
+# type: "rows" or "columns"
 load_dimension_table <- function(iso3, version, type) {
-  # type: "rows" or "columns"
   file_name <- paste0(toupper(iso3), "_", version, "_lookups.xlsx")
   lookup_path <- file.path("inputs", "lookups", tolower(iso3), file_name)
   if (!file.exists(lookup_path)) {
