@@ -17,7 +17,11 @@ base_data_path <- get_base_path()
 
 # ── 2. DISCOVER ───────────────────────────────────────────────────────────────
 
-config_files <- list.files("configs", pattern = "\\.csv$", full.names = TRUE)
+config_files <- list.files(
+  "inputs/configs",
+  pattern = "\\.csv$",
+  full.names = TRUE
+)
 if (length(config_files) == 0) {
   stop("No config CSVs found in configs/")
 }
@@ -95,12 +99,8 @@ for (m_path in config_files) {
 
   # D. Join facts + lookups
   national_flat <- facts |>
-    left_join(rows_lookup, by = c("row_id" = "stable_id")) |>
-    left_join(
-      cols_lookup,
-      by = c("col_id" = "stable_id"),
-      suffix = c("_row", "_col")
-    )
+    left_join(rows_lookup, by = "row_id") |>
+    left_join(cols_lookup, by = "col_id", suffix = c("_row", "_col"))
 
   # Sanity check: target_table from metadata must match lookup table column
   mismatches <- national_flat |>

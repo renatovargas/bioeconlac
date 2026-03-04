@@ -130,6 +130,8 @@ extract_sut_quadrant <- function(row) {
 # ── Dimension table loader ────────────────────────────────────────────────────
 
 # type: "rows" or "columns"
+# rows sheet must have a column named row_id
+# columns sheet must have a column named col_id
 load_dimension_table <- function(iso3, version, type) {
   file_name <- paste0(toupper(iso3), "_", version, "_lookups.xlsx")
   lookup_path <- file.path("inputs", "lookups", tolower(iso3), file_name)
