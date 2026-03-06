@@ -1,0 +1,4 @@
+iso3,year,lookup_version,quadrant_code,quadrant,file_name,sheet_name
+PAN,2018,v02,q01,OFERTA DE PRODUCTOS A PRECIOS DE COMPRADOR,PAN_COU_Corr_2018.xlsx,Oferta
+PAN,2018,v02,q02,UTILIZACIÓN DE PRODUCTOS A PRECIOS DE COMPRADOR,PAN_COU_Corr_2018.xlsx,Utilización
+PAN,2018,v02,q03,VALOR AGREGADO BRUTO TOTAL/PIB,PAN_COU_Corr_2018.xlsx,Utilización

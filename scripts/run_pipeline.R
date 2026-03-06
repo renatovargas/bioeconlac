@@ -18,12 +18,13 @@ base_data_path <- get_base_path()
 # ── 2. DISCOVER ───────────────────────────────────────────────────────────────
 
 config_files <- list.files(
-  "inputs/configs",
-  pattern = "\\.csv$",
-  full.names = TRUE
+  "inputs",
+  pattern = "\\_config.csv$",
+  full.names = TRUE,
+  recursive = TRUE
 )
 if (length(config_files) == 0) {
-  stop("No config CSVs found in configs/")
+  stop("No config CSVs found in inputs/")
 }
 
 # ── 3. DATABASE ───────────────────────────────────────────────────────────────
@@ -146,6 +147,5 @@ for (m_path in config_files) {
 }
 
 # ── 5. CLOSE ──────────────────────────────────────────────────────────────────
-message("  v Exported Excel: ", output_path)
 dbDisconnect(con)
 message("── Done. DuckDB: ", db_path)

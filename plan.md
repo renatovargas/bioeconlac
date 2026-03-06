@@ -45,7 +45,11 @@ what's in it. `run_pipeline.R` is imperative — it's the thing you run.
 ### 2. Config: slim down to year-specific columns only
 
 The config CSV should contain only what is irreducibly year-specific. Everything
-fixed by the lookup version belongs in the lookup `quadrants` metadata sheet.
+fixed by the lookup version belongs in the lookup `quadrants` metadata sheet,
+**with one exception**: `sheet_name` stays in the config because some countries
+pack all years into one file and use the year (e.g. `"2018"`) as the sheet name.
+If `sheet_name` ever changes within a version, it is a config change, not a
+version change.
 
 **Config columns:**
 
@@ -56,26 +60,26 @@ fixed by the lookup version belongs in the lookup `quadrants` metadata sheet.
 | `lookup_version` | Clean version token e.g. `v02` (not a filename) |
 | `quadrant_code` | Short key e.g. `q01` — joins to the `quadrants` sheet in the lookup |
 | `quadrant` | Human-readable label from the source file (documentation only) |
-| `file_name` | Source Excel filename — the only thing that truly changes year to year |
+| `file_name` | Source Excel filename — changes year to year |
+| `sheet_name` | Sheet name in the source Excel — may vary by year for multi-year files |
 
 `quadrant` in the config is kept for documentation and cross-reference, but the
 **authoritative value is in the lookup `quadrants` sheet**. At load time the
 pipeline checks that both match and warns if they do not, then drops the config
 copy.
 
-`sheet_name`, `cell_range`, `excl_rows`, and `excl_cols` move to the lookup
-`quadrants` sheet — they are properties of the classification version's table
-layout, not the year. If any of these change, a new lookup version should be
-created.
+`cell_range`, `excl_rows`, and `excl_cols` are in the lookup `quadrants` sheet —
+they are properties of the classification version's table layout. If any of these
+change, a new lookup version should be created.
 
 **Example `config_pan.csv`:**
 
 ```
-iso3,year,lookup_version,quadrant_code,quadrant,file_name
-PAN,2018,v02,q01,OFERTA DE PRODUCTOS A PRECIOS DE COMPRADOR,PAN_COU_Corr_2018.xlsx
-PAN,2018,v02,q02,UTILIZACION DE PRODUCTOS A PRECIOS DE COMPRADOR,PAN_COU_Corr_2018.xlsx
-PAN,2019,v02,q01,OFERTA DE PRODUCTOS A PRECIOS DE COMPRADOR,PAN_COU_Corr_2019.xlsx
-PAN,2019,v02,q02,UTILIZACION DE PRODUCTOS A PRECIOS DE COMPRADOR,PAN_COU_Corr_2019.xlsx
+iso3,year,lookup_version,quadrant_code,quadrant,file_name,sheet_name
+PAN,2018,v02,q01,OFERTA DE PRODUCTOS A PRECIOS DE COMPRADOR,PAN_COU_Corr_2018.xlsx,Oferta
+PAN,2018,v02,q02,UTILIZACION DE PRODUCTOS A PRECIOS DE COMPRADOR,PAN_COU_Corr_2018.xlsx,Utilización
+PAN,2019,v02,q01,OFERTA DE PRODUCTOS A PRECIOS DE COMPRADOR,PAN_COU_Corr_2019.xlsx,Oferta
+PAN,2019,v02,q02,UTILIZACION DE PRODUCTOS A PRECIOS DE COMPRADOR,PAN_COU_Corr_2019.xlsx,Utilización
 ```
 
 ### 3. `sut_functions.R`: rewrite close to original style
@@ -163,10 +167,12 @@ Example: `inputs/lookups/pan/PAN_v02_lookups.xlsx`
 | `quadrant_code` | Short key (`q01`, `q02`) — foreign key from config |
 | `quadrant` | Human-readable label from source file (authoritative copy) |
 | `target_table` | `supply`, `use`, `va`, `employment` |
-| `sheet_name` | Sheet name in the source Excel |
 | `cell_range` | Cell range of the data rectangle |
 | `excl_rows` | Comma-separated row indices to exclude (totals, blanks, etc.) |
 | `excl_cols` | Comma-separated column indices to exclude |
+
+Note: `sheet_name` is intentionally absent — it lives in the config because
+countries that pack all years into one file use different sheet names per year.
 
 A failed join on `quadrant_code` is a hard `stop()` — extraction is undefined
 without metadata.

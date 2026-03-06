@@ -36,9 +36,14 @@ parse_excl <- function(x) {
 
 # Loads the quadrants metadata sheet from the versioned lookup file.
 # Returns a data frame with one row per quadrant_code for this version.
+# sheet_name is NOT here — it lives in the config, as it varies by year-file
+# (e.g. countries that pack all years into one file use the year as sheet name).
 load_quadrant_meta <- function(iso3, version) {
-  file_name <- paste0(toupper(iso3), "_", version, "_lookups.xlsx")
-  lookup_path <- file.path("inputs", "lookups", tolower(iso3), file_name)
+  lookup_path <- file.path(
+    "inputs",
+    tolower(iso3),
+    paste0(tolower(iso3), "_", version, "_lookups.xlsx")
+  )
   if (!file.exists(lookup_path)) {
     stop("Lookup file missing: ", lookup_path)
   }
@@ -49,6 +54,8 @@ load_quadrant_meta <- function(iso3, version) {
 
 # Processes one config row (already joined with quadrant metadata) into a
 # long tidy tibble of fact rows.
+# sheet_name comes from config (varies by year-file).
+# cell_range, excl_rows, excl_cols come from quadrant metadata (fixed by version).
 extract_sut_quadrant <- function(row) {
   # row: a single-row data frame with config + quadrant metadata columns
 
@@ -82,14 +89,14 @@ extract_sut_quadrant <- function(row) {
   n_cols <- ncol(datos)
   row_ids <- sprintf(
     "%s_%s_%s_r%04d",
-    iso3,
+    toupper(iso3),
     version,
     target_table,
     seq_len(n_rows)
   )
   col_ids <- sprintf(
     "%s_%s_%s_c%04d",
-    iso3,
+    toupper(iso3),
     version,
     target_table,
     seq_len(n_cols)
@@ -133,8 +140,11 @@ extract_sut_quadrant <- function(row) {
 # rows sheet must have a column named row_id
 # columns sheet must have a column named col_id
 load_dimension_table <- function(iso3, version, type) {
-  file_name <- paste0(toupper(iso3), "_", version, "_lookups.xlsx")
-  lookup_path <- file.path("inputs", "lookups", tolower(iso3), file_name)
+  lookup_path <- file.path(
+    "inputs",
+    tolower(iso3),
+    paste0(tolower(iso3), "_", version, "_lookups.xlsx")
+  )
   if (!file.exists(lookup_path)) {
     stop("Lookup file missing: ", lookup_path)
   }
