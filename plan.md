@@ -128,27 +128,30 @@ Structure mirrors `05-procesamiento-con-funciones.R` in spirit:
 
 No `purrr` dependency for the main loop — use `lapply` + `bind_rows`.
 
-### 5. Stable ID format — reference target table, not quadrant
+### 5. Stable ID format — reference quadrant, not target table
 
-Stable IDs encode: **country + lookup version + target table + dimension + sequence**:
+Stable IDs use `quadrant_code` (not `target_table`) because quadrants within
+the same target table do not necessarily share the same columns — each quadrant
+has its own independent row and column sequences. Using `target_table` would
+require manually continuing the sequence across quadrants and make it impossible
+to tell which stable ID belongs to which quadrant file.
+
+Stable IDs encode: **country + lookup version + quadrant code + dimension + sequence**:
 
 ```
-<iso3>_<version>_<target_table>_r0001   <- row stable ID
-<iso3>_<version>_<target_table>_c0001   <- column stable ID
+<iso3>_<version>_<quadrant_code>_r0001   <- row stable ID
+<iso3>_<version>_<quadrant_code>_c0001   <- column stable ID
 ```
 
 All lowercase, underscore-separated, zero-padded **4 digits**.
 
-**Target table tokens:** `supply`, `use`, `va`, `employment`
+**Examples for Panama v02:**
+- `pan_v02_q01_r0001` — first row of quadrant q01
+- `pan_v02_q01_c0001` — first column of quadrant q01
+- `pan_v02_q02_r0001` — first row of quadrant q02 (independent sequence)
 
-**Examples:**
-- `pan_v02_supply_r0001` — first row of Panama supply table, lookup version 02
-- `pan_v02_supply_c0001` — first column of Panama supply table, lookup version 02
-- `pan_v02_use_r0001`    — first row of Panama use table
-
-The `lookup_version` in the stable ID is the classification version, not the
-year. The flat table will legitimately contain rows with different
-`lookup_version` values stacked. Aggregation to CPC/ISIC handles reconciliation.
+The lookup `rows` and `columns` sheets stack all quadrants on top of one another,
+each with their own `row_id` / `col_id` sequences starting from `0001`.
 
 ### 6. Lookup file structure
 

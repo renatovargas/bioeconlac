@@ -6,25 +6,28 @@
 
 # ── 1. SETUP ──────────────────────────────────────────────────────────────────
 
-source("scripts/sut_functions.R")
-
 library(tidyverse)
 library(readxl)
 library(writexl)
 library(duckdb)
 
+# Clean the environment
+rm(list = ls())
+
+# Source important data
+source("scripts/sut_functions.R")
 base_data_path <- get_base_path()
 
 # ── 2. DISCOVER ───────────────────────────────────────────────────────────────
 
 config_files <- list.files(
   "inputs",
-  pattern = "\\_config.csv$",
+  pattern = "_config\\.xlsx$",
   full.names = TRUE,
   recursive = TRUE
 )
 if (length(config_files) == 0) {
-  stop("No config CSVs found in inputs/")
+  stop("No config Excel files found in inputs/")
 }
 
 # ── 3. DATABASE ───────────────────────────────────────────────────────────────
@@ -35,11 +38,7 @@ con <- dbConnect(duckdb(), db_path)
 # ── 4. LOOP ───────────────────────────────────────────────────────────────────
 
 for (m_path in config_files) {
-  config <- read_csv(
-    m_path,
-    show_col_types = FALSE,
-    locale = locale(encoding = "UTF-8")
-  )
+  config <- read_excel(m_path)
 
   current_iso <- unique(config$iso3)
   current_ver <- unique(config$lookup_version)
@@ -103,38 +102,26 @@ for (m_path in config_files) {
     left_join(rows_lookup, by = "row_id") |>
     left_join(cols_lookup, by = "col_id", suffix = c("_row", "_col"))
 
-  # Sanity check: target_table from metadata must match lookup table column
-  mismatches <- national_flat |>
-    filter(target_table != table_row | target_table != table_col)
-  if (nrow(mismatches) > 0) {
-    warning(
-      current_iso,
-      ": ",
-      nrow(mismatches),
-      " rows have target_table mismatch between quadrant metadata and lookup"
+  # E. Upsert into DuckDB: delete existing rows for this iso3 + year, then append
+  years_in_batch <- paste(unique(national_flat$year), collapse = ", ")
+
+  if (dbExistsTable(con, "sut_flat")) {
+    dbExecute(
+      con,
+      sprintf(
+        "DELETE FROM sut_flat WHERE iso3 = '%s' AND year IN (%s)",
+        current_iso,
+        years_in_batch
+      )
     )
   }
 
-  # Drop redundant lookup table columns — metadata-derived target_table is authoritative
-  national_flat <- national_flat |>
-    select(-table_row, -table_col)
-
-  # E. Upsert into DuckDB: delete existing rows for this iso3 + year, then append
-  years_in_batch <- paste(unique(national_flat$year), collapse = ", ")
-  dbExecute(
-    con,
-    sprintf(
-      "DELETE FROM sut_flat WHERE iso3 = '%s' AND year IN (%s)",
-      current_iso,
-      years_in_batch
-    )
-  )
   dbWriteTable(con, "sut_flat", national_flat, append = TRUE)
 
-  message("  v Upserted ", nrow(national_flat), " rows for ", current_iso)
+  message("  ✓ Upserted ", nrow(national_flat), " rows for ", current_iso)
 
   # F. Export per-country Excel from DuckDB (authoritative export)
-  output_dir <- file.path(base_data_path, tolower(current_iso), "output")
+  output_dir <- file.path(base_data_path, tolower(current_iso), "outputs")
   dir.create(output_dir, showWarnings = FALSE, recursive = TRUE)
   output_path <- file.path(output_dir, paste0(current_iso, "_flat.xlsx"))
 

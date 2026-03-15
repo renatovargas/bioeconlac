@@ -2,7 +2,7 @@
 # Renato Vargas
 #
 # Pure functions for extracting and loading SUT quadrant data.
-# No library() calls here — load libraries in run_pipeline.R.
+# No library() calls here — load libraries in main_run.R.
 
 # ── Environment ───────────────────────────────────────────────────────────────
 
@@ -35,7 +35,6 @@ parse_excl <- function(x) {
 # ── Quadrant metadata loader ──────────────────────────────────────────────────
 
 # Loads the quadrants metadata sheet from the versioned lookup file.
-# Returns a data frame with one row per quadrant_code for this version.
 # sheet_name is NOT here — it lives in the config, as it varies by year-file
 # (e.g. countries that pack all years into one file use the year as sheet name).
 load_quadrant_meta <- function(iso3, version) {
@@ -57,12 +56,10 @@ load_quadrant_meta <- function(iso3, version) {
 # sheet_name comes from config (varies by year-file).
 # cell_range, excl_rows, excl_cols come from quadrant metadata (fixed by version).
 extract_sut_quadrant <- function(row) {
-  # row: a single-row data frame with config + quadrant metadata columns
-
   base_path <- get_base_path()
   iso3 <- tolower(row$iso3)
   version <- row$lookup_version
-  target_table <- row$target_table # from quadrant metadata (authoritative)
+  target_table <- row$target_table
   year <- as.integer(row$year)
 
   # Resolve file path: <BIO_DATA_PATH>/<iso3>/sut/<file_name>
@@ -76,7 +73,7 @@ extract_sut_quadrant <- function(row) {
   excl_cols <- parse_excl(row$excl_cols)
 
   # Read the data rectangle — all numeric
-  datos <- read_excel(
+  raw_data <- read_excel(
     full_path,
     sheet = row$sheet_name,
     range = row$cell_range,
@@ -85,39 +82,39 @@ extract_sut_quadrant <- function(row) {
   )
 
   # Build stable IDs (4-digit zero-padded)
-  n_rows <- nrow(datos)
-  n_cols <- ncol(datos)
+  n_rows <- nrow(raw_data)
+  n_cols <- ncol(raw_data)
   row_ids <- sprintf(
     "%s_%s_%s_r%04d",
-    toupper(iso3),
+    iso3,
     version,
-    target_table,
+    row$quadrant_code,
     seq_len(n_rows)
   )
   col_ids <- sprintf(
     "%s_%s_%s_c%04d",
-    toupper(iso3),
+    iso3,
     version,
-    target_table,
+    row$quadrant_code,
     seq_len(n_cols)
   )
 
   # Replace NA with 0, assign stable ID names
-  datos <- datos |>
+  raw_data <- raw_data |>
     mutate(across(everything(), ~ replace_na(.x, 0))) |>
     setNames(col_ids) |>
     mutate(row_id = row_ids, .before = 1)
 
   # Exclude flagged rows and columns
   if (length(excl_rows) > 0) {
-    datos <- filter(datos, !row_id %in% row_ids[excl_rows])
+    raw_data <- filter(raw_data, !row_id %in% row_ids[excl_rows])
   }
   if (length(excl_cols) > 0) {
-    datos <- select(datos, -all_of(col_ids[excl_cols]))
+    raw_data <- select(raw_data, -all_of(col_ids[excl_cols]))
   }
 
   # Pivot longer -> tidy fact rows
-  datos |>
+  raw_data |>
     pivot_longer(
       cols = -row_id,
       names_to = "col_id",
@@ -129,7 +126,7 @@ extract_sut_quadrant <- function(row) {
       lookup_version = version,
       target_table = target_table,
       quadrant_code = row$quadrant_code,
-      quadrant = row$quadrant, # authoritative label from metadata
+      quadrant = row$quadrant,
       .before = 1
     )
 }
