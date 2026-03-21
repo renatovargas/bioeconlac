@@ -16,7 +16,19 @@ get_base_path <- function() {
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
 
+# Expand a single token: "65:76" -> 65:76, "1" -> 1L.
+expand_token <- function(token) {
+  token <- trimws(token)
+  if (grepl(":", token, fixed = TRUE)) {
+    parts <- as.integer(strsplit(token, ":", fixed = TRUE)[[1]])
+    seq(parts[1], parts[2])
+  } else {
+    as.integer(token)
+  }
+}
+
 # Safely parse a comma-separated exclusion string to an integer vector.
+# Tokens may be plain integers ("1") or ranges ("65:76").
 # Returns integer(0) for NA, empty string, "0", or "none".
 parse_excl <- function(x) {
   if (length(x) == 0) {
@@ -29,7 +41,8 @@ parse_excl <- function(x) {
   if (nchar(x) == 0 || x == "0" || tolower(x) == "none") {
     return(integer(0))
   }
-  as.integer(unlist(strsplit(x, ",")))
+  tokens <- strsplit(x, ",", fixed = TRUE)[[1]]
+  as.integer(unlist(lapply(tokens, expand_token)))
 }
 
 # ── Quadrant metadata loader ──────────────────────────────────────────────────
