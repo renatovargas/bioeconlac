@@ -9,7 +9,7 @@ library(readxl)
 rm(list = ls())
 
 
-data_path <- "~/Dropbox/work/2025-06-CEPAL/data/old_databases"
+data_path <- "~/Dropbox/work/2025-06-CEPAL_Latam/data/old_databases"
 
 # Data ingestion
 db_files <- list.files(
